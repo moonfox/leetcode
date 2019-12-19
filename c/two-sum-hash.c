@@ -1,18 +1,20 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 int *twoSum(int *nums, int numsSize, int target, int *returnSize);
 
 #define HASHSIZE 100
 
+typedef struct hash_table *TablePtr;
+typedef struct hash_node *NodePtr;
+
 typedef struct hash_node
 {
   int key;
   int value;
-  struct hash_node *next;
+  NodePtr next;
 } HashNode;
-
-typedef struct hash_node *NodePtr;
 
 typedef struct hash_table
 {
@@ -20,16 +22,16 @@ typedef struct hash_table
   NodePtr *header;
 } HashTable;
 
-typedef struct hash_table *TablePtr;
-
 unsigned hash(int key, int size);
 
 TablePtr init_hashtable(int size);
 NodePtr insert_node(TablePtr hashtab, int key, int index);
 NodePtr find_node(TablePtr hashtab, int key);
 void free_hashtable(TablePtr hashtab);
+
 void print_node(NodePtr np);
 void print_ary(int ary[], int n);
+void read_by_char(char *);
 
 TablePtr init_hashtable(int size)
 {
@@ -41,6 +43,8 @@ TablePtr init_hashtable(int size)
 
   hashtab->size = size;
   hashtab->header = (NodePtr *)malloc(sizeof(NodePtr) * size);
+
+  memset(hashtab->header, 0, (sizeof(NodePtr) * size));
 
   if (hashtab->header == NULL)
     return NULL;
@@ -58,10 +62,13 @@ NodePtr find_node(TablePtr hashtab, int key)
   NodePtr np;
   unsigned hashval = hash(key, hashtab->size);
 
-  for (np = hashtab->header[hashval]; np != NULL; np = np->next)
+  np = hashtab->header[hashval];
+  for (; np != NULL; np = np->next)
   {
     if (np->key == key)
+    {
       return np;
+    }
   }
 
   return NULL;
@@ -108,14 +115,6 @@ void free_hashtable(TablePtr hashtab)
   free(hashtab);
 }
 
-void print_node(NodePtr np)
-{
-  for (; np != NULL; np = np->next)
-  {
-    printf("%d:%d\n", np->key, np->value);
-  }
-}
-
 int *twoSum(int *nums, int numsSize, int target, int *returnSize)
 {
   int *result = (int *)malloc(sizeof(int) * 2);
@@ -125,7 +124,7 @@ int *twoSum(int *nums, int numsSize, int target, int *returnSize)
 
   if ((hashtab = init_hashtable(HASHSIZE)) == NULL)
   {
-    printf("malloc init_hashtable is fail\n");
+    printf("init hashtable fail\n");
     return NULL;
   }
 
@@ -137,7 +136,7 @@ int *twoSum(int *nums, int numsSize, int target, int *returnSize)
 
       result[0] = np->value;
       result[1] = i;
-      // *returnSize = 2;
+      *returnSize = 2;
       break;
     }
     insert_node(hashtab, nums[i], i);
@@ -147,9 +146,36 @@ int *twoSum(int *nums, int numsSize, int target, int *returnSize)
   return result;
 }
 
+void print_node(NodePtr np)
+{
+  for (; np != NULL; np = np->next)
+  {
+    printf("%d:%d\n", np->key, np->value);
+  }
+}
+
+void read_by_char(char *ptr)
+{
+  int len = sizeof(*ptr);
+  printf("ss:%d\n", len);
+
+  for (size_t i = 0; i < len; i++)
+  {
+    printf("byte:%u\n", ptr[i]);
+  }
+}
+
+// 打印数组
+void print_ary(int ary[], int n)
+{
+  for (int i = 0; i < n; i++)
+    printf("%d ", ary[i]);
+  printf("\n");
+}
+
 int main(int argc, char const *argv[])
 {
-  int nums[] = {16, 2, 7, 11, 15};
+  int nums[] = {16, 15, 2, 7, 11};
 
   int len = 5; //sizeof(nums);
 
@@ -161,19 +187,6 @@ int main(int argc, char const *argv[])
     return -1;
   }
 
-  for (size_t i = 0; i < len; i++)
-  {
-    if (insert_node(hashtab, nums[i], i) == NULL)
-    {
-      return -2;
-    }
-  }
-
-  for (size_t i = 0; i < hashtab->size; i++)
-  {
-    // if (hashtab->header[i] != NULL)
-    // print_node(hashtab->header[i]);
-  }
 
   int *resault, *returnSize;
 
@@ -183,10 +196,4 @@ int main(int argc, char const *argv[])
   return 0;
 }
 
-// 打印数组
-void print_ary(int ary[], int n)
-{
-  for (int i = 0; i < n; i++)
-    printf("%d ", ary[i]);
-  printf("\n");
-}
+
