@@ -31,7 +31,7 @@ void free_hashtable(TablePtr hashtab);
 
 void print_node(NodePtr np);
 void print_ary(int ary[], int n);
-void read_by_char(char *);
+void read_by_char(NodePtr np);
 
 TablePtr init_hashtable(int size)
 {
@@ -154,14 +154,20 @@ void print_node(NodePtr np)
   }
 }
 
-void read_by_char(char *ptr)
+void read_by_char(NodePtr np)
 {
-  int len = sizeof(*ptr);
+  int len = sizeof(*np);
   printf("ss:%d\n", len);
+
+  int *ptr;
+  ptr = (int *)(np);
+  printf("ss:%d\n", len);
+
+  // printf("value_ptr:%d\n", *ptr);
 
   for (size_t i = 0; i < len; i++)
   {
-    printf("byte:%u\n", ptr[i]);
+    printf("byte:%d\n", *ptr);
   }
 }
 
@@ -187,7 +193,6 @@ int main(int argc, char const *argv[])
     return -1;
   }
 
-
   int *resault, *returnSize;
 
   resault = twoSum(nums, len, 9, returnSize);
@@ -195,5 +200,3 @@ int main(int argc, char const *argv[])
   free(resault);
   return 0;
 }
-
-
